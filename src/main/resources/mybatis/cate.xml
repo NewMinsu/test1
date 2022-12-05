@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ 
+<!DOCTYPE mapper 
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ 
+<!-- cate.xml과 연동되는 Spring interface "dev.mvc.cate.CateDAOInter" 선언 --> 
+<mapper namespace="dev.mvc.cate.CateDAOInter">
+  <insert id="create" parameterType="dev.mvc.cate.CateVO">
+    INSERT INTO cate(cateno, name, cnt, rdate, seqno, visible)
+    VALUES (cate_seq.nextval, #{name}, 0, sysdate, #{seqno}, 'N')
+  </insert> 
+  
+  <!-- 
+  전체 목록, 출력 순서 반영
+  레코드 갯수 만큼 CateVO 객체를 만들어 ArrayList에 저장하여 리턴,
+  ArrayList<CateVO> list = new ArrayList<CateVO>(); 
+  -->
+  <select id="list_all" resultType="dev.mvc.cate.CateVO">
+		SELECT cateno, name, cnt, rdate, udate, seqno, visible
+		FROM cate
+		ORDER BY seqno ASC
+  </select>
+  
+  <!-- 조회, id: read, 입력: cateno, 리턴: CateVO -->
+  <select id="read" resultType="dev.mvc.cate.CateVO" parameterType="int">
+		SELECT cateno, name, cnt, rdate, udate, seqno, visible
+		FROM cate
+		WHERE cateno = #{cateno}
+  </select>  
+
+  <!-- 수정 처리 -->  
+  <update id="update" parameterType="dev.mvc.cate.CateVO">
+		UPDATE cate
+		SET name=#{name}, seqno=#{seqno}, udate=sysdate
+		WHERE cateno=#{cateno}
+  </update>  
+  
+  <!-- 삭제, return: int -->
+  <delete id="delete" parameterType="int">
+    DELETE FROM cate
+    WHERE cateno = #{cateno}
+  </delete>   
+  
+  <!-- 출력 순서 올림(상향, 10 등 -> 1 등), seqno: 10 -> 1 -->
+  <update id="update_seqno_up" parameterType="int">
+	  UPDATE cate
+	  SET seqno = seqno - 1
+	  WHERE cateno = #{cateno }
+  </update>
+
+  <!-- 출력 순서 내림(상향, 1 등 -> 10 등), seqno: 1 -> 10 -->
+  <update id="update_seqno_down" parameterType="int">
+	  UPDATE cate
+	  SET seqno = seqno + 1
+	  WHERE cateno = #{cateno }
+  </update>
+
+  <!-- 출력 모드: Y -->
+  <update id="update_visible_y" parameterType="int">
+    UPDATE cate
+    SET visible = 'Y'
+    WHERE cateno=#{cateno }
+  </update>
+
+  <!-- 출력 모드: N -->
+  <update id="update_visible_n" parameterType="int">
+    UPDATE cate
+    SET visible = 'N'
+    WHERE cateno=#{cateno }
+  </update>
+
+  <!-- 
+  visible이 'Y'인 카테고리 출력하기
+  -->
+  <select id="list_all_y" resultType="dev.mvc.cate.CateVO">
+		SELECT cateno, name, cnt, rdate, udate, seqno, visible
+		FROM cate
+		WHERE visible='Y'
+		ORDER BY seqno ASC
+  </select>
+
+  <!-- 글수 증가 -->
+  <update id="update_cnt_add" parameterType="int">
+		UPDATE cate
+		SET cnt = cnt + 1
+		WHERE cateno=#{cateno}
+  </update>
+  
+  <!-- 글수 감소 -->
+  <update id="update_cnt_sub" parameterType="int">
+		UPDATE cate
+		SET cnt = cnt - 1
+		WHERE cateno=#{cateno}
+  </update>
+  
+       
+</mapper>
+
+
+
+
